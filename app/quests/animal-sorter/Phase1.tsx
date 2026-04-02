@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ANIMALS, CATEGORIES } from "./data";
+import AnimalAnim from "./AnimalAnim";
 
 const shuffled = [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 8);
 
@@ -20,8 +21,6 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
       </div>
     );
   }
-
-  const Icon = current.icon;
 
   const pick = (cat: string) => {
     if (cat === current.category) {
@@ -47,24 +46,20 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
         <div className="progress-fill" style={{ width: `${(sorted / shuffled.length) * 100}%` }} />
       </div>
 
-      {/* Current animal */}
-      <div className="my-4 p-6 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `3px solid ${current.color}` }}>
-        <Icon size={96} color={current.color} strokeWidth={1.5} />
+      <div className="my-4 p-4 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `3px solid ${current.color}` }}>
+        <AnimalAnim src={current.lottie} size={120} />
       </div>
       <div className="text-xl font-semibold">What animal is this?</div>
 
-      {/* Feedback */}
       <div className="text-lg min-h-[2em] font-semibold">{feedback}</div>
 
-      {/* Buckets */}
       {!feedback && (
         <div className="flex flex-wrap justify-center gap-3 fade-in">
           {CATEGORIES.map((cat) => {
             const a = ANIMALS.find((x) => x.category === cat)!;
-            const CatIcon = a.icon;
             return (
               <button key={cat} className="btn flex flex-col items-center gap-1 px-5 py-3" style={{ background: "var(--card)" }} onClick={() => pick(cat)}>
-                <CatIcon size={32} color={a.color} strokeWidth={1.5} />
+                <AnimalAnim src={a.lottie} size={36} />
                 <span className="text-sm capitalize">{cat}</span>
               </button>
             );

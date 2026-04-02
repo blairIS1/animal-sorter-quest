@@ -1,17 +1,15 @@
 "use client";
-import { Cat, Dog, Bird, Fish, Rabbit } from "lucide-react";
 
 export const ANIMALS = [
-  { id: "cat", label: "Cat", icon: Cat, color: "#f97316", category: "cat" },
-  { id: "dog", label: "Dog", icon: Dog, color: "#3b82f6", category: "dog" },
-  { id: "bird", label: "Bird", icon: Bird, color: "#22c55e", category: "bird" },
-  { id: "fish", label: "Fish", icon: Fish, color: "#06b6d4", category: "fish" },
-  { id: "rabbit", label: "Rabbit", icon: Rabbit, color: "#a855f7", category: "rabbit" },
+  { id: "cat", label: "Cat", lottie: "/animal-sorter-quest/animations/cat.json", color: "#f97316", category: "cat" },
+  { id: "dog", label: "Dog", lottie: "/animal-sorter-quest/animations/dog.json", color: "#3b82f6", category: "dog" },
+  { id: "bird", label: "Bird", lottie: "/animal-sorter-quest/animations/bird.json", color: "#22c55e", category: "bird" },
+  { id: "fish", label: "Fish", lottie: "/animal-sorter-quest/animations/fish.json", color: "#06b6d4", category: "fish" },
+  { id: "rabbit", label: "Rabbit", lottie: "/animal-sorter-quest/animations/rabbit.json", color: "#a855f7", category: "rabbit" },
 ] as const;
 
 export const CATEGORIES = ["cat", "dog", "bird", "fish", "rabbit"] as const;
 
-// Phase 2: robot guesses — some intentionally wrong
 export const GUESS_ROUNDS = [
   { animal: "cat", robotGuess: "cat", correct: true },
   { animal: "dog", robotGuess: "dog", correct: true },
@@ -23,7 +21,6 @@ export const GUESS_ROUNDS = [
   { animal: "rabbit", robotGuess: "rabbit", correct: true },
 ];
 
-// Phase 3: tricky animals
 export const TRICKY_ROUNDS = [
   { emoji: "🦊", label: "Fox", options: ["cat", "dog"], answer: "dog", reason: "Foxes are in the dog family!" },
   { emoji: "🐧", label: "Penguin", options: ["bird", "fish"], answer: "bird", reason: "Penguins are birds that swim!" },

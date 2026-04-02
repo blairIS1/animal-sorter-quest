@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ANIMALS, GUESS_ROUNDS } from "./data";
+import AnimalAnim from "./AnimalAnim";
 
 export default function Phase2({ onComplete }: { onComplete: (score: number) => void }) {
   const [idx, setIdx] = useState(0);
@@ -21,7 +22,6 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
 
   const animal = ANIMALS.find((a) => a.id === round.animal)!;
   const guessAnimal = ANIMALS.find((a) => a.id === round.robotGuess)!;
-  const Icon = animal.icon;
 
   const respond = (correct: boolean) => {
     if (round.correct && correct) {
@@ -45,20 +45,16 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
       </p>
       <div className="text-sm opacity-70">{idx + 1} / {GUESS_ROUNDS.length}</div>
 
-      {/* Animal */}
-      <div className="my-4 p-6 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `3px solid ${animal.color}` }}>
-        <Icon size={96} color={animal.color} strokeWidth={1.5} />
+      <div className="my-4 p-4 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `3px solid ${animal.color}` }}>
+        <AnimalAnim src={animal.lottie} size={120} />
       </div>
 
-      {/* Robot guess */}
       <div className="text-xl text-center">
-        🤖 "I think this is a... <b style={{ color: guessAnimal.color }}>{guessAnimal.label}!</b>"
+        🤖 &quot;I think this is a... <b style={{ color: guessAnimal.color }}>{guessAnimal.label}!</b>&quot;
       </div>
 
-      {/* Feedback */}
       <div className="text-lg min-h-[2em] font-semibold text-center max-w-md">{feedback}</div>
 
-      {/* Buttons */}
       {!feedback && (
         <div className="flex gap-4 fade-in">
           <button className="btn text-xl" style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => respond(true)}>
