@@ -1,24 +1,23 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { ANIMALS, CATEGORIES } from "./data";
+import { ANIMALS, CATEGORIES, TrainingData } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak } from "./speak";
-import Confetti, { Sparkle } from "./Confetti";
-import { useMode } from "./ModeContext";
+import Confetti from "./Confetti";
 
-const makeQueue = () => [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5);
+const makeQueue = () => [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 8);
 
-export default function Phase1({ onComplete }: { onComplete: () => void }) {
-  const mode = useMode();
-  const [queue] = useState(() => makeQueue().slice(0, mode === "eva" ? 4 : 8));
+export default function Phase1({ onComplete }: { onComplete: (data: TrainingData) => void }) {
+  const [queue] = useState(makeQueue);
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"idle" | "happy" | "confused" | "celebrate">("idle");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [training, setTraining] = useState<TrainingData>({});
+  const spokenRef = useRef(-1);
   const done = idx >= queue.length;
   const current = queue[idx];
-  const spokenRef = useRef(-1);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
@@ -33,7 +32,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
         <RobotBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">Robi is learning!</h2>
         <p className="text-lg opacity-80">You taught Robi {queue.length} animals. Let&apos;s see if Robi can guess!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("lets_guess.mp3").then(onComplete); }}>Next →</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("lets_guess.mp3").then(() => onComplete(training)); }}>Next →</button>
       </div>
     );
   }
@@ -45,6 +44,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
       sfxCorrect();
       setMood("happy");
       setShowConfetti(true);
+      setTraining((t) => ({ ...t, [cat]: (t[cat] || 0) + 1 }));
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
       speak("correct_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle"); setShowConfetti(false);

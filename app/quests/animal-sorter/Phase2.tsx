@@ -1,43 +1,54 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { ANIMALS, GUESS_ROUNDS } from "./data";
+import { ANIMALS, TrainingData, generateGuessRounds } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxThink } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
 
-export default function Phase2({ onComplete }: { onComplete: (score: number) => void }) {
+export default function Phase2({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
+  const [rounds] = useState(() => generateGuessRounds(training));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [corrections, setCorrections] = useState(0);
   const [mood, setMood] = useState<"thinking" | "happy" | "confused">("thinking");
   const spokenRef = useRef(-1);
-  const done = idx >= GUESS_ROUNDS.length;
+  const done = idx >= rounds.length;
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
       spokenRef.current = idx;
-      const g = ANIMALS.find((a) => a.id === GUESS_ROUNDS[idx].robotGuess)!;
+      const g = ANIMALS.find((a) => a.id === rounds[idx].robotGuess)!;
       speak("think_" + g.category + ".mp3");
     }
-  }, [idx, done]);
+  }, [idx, done, rounds]);
 
   if (done) {
+    const correct = rounds.length - corrections;
+    const pct = Math.round((correct / rounds.length) * 100);
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={120} />
-        <h2 className="text-3xl font-bold">Robi is getting smarter!</h2>
-        <p className="text-lg opacity-80">You corrected {corrections} mistakes. Robi learned from each one!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("tricky_round.mp3").then(() => onComplete(corrections)); }}>Next → Tricky Round!</button>
+        <h2 className="text-3xl font-bold">Robi scored {pct}%!</h2>
+        <p className="text-lg opacity-80 text-center max-w-md">
+          {corrections === 0
+            ? "Perfect! Robi got every one right — great training data!"
+            : `You corrected ${corrections} mistake${corrections > 1 ? "s" : ""}. ${corrections >= 3 ? "Robi needed more training data!" : "Robi learned from each correction!"}`}
+        </p>
+        <div className="progress-track w-64">
+          <div className="progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("tricky_round.mp3").then(onComplete); }}>Next → Tricky Round!</button>
       </div>
     );
   }
 
-  const round = GUESS_ROUNDS[idx];
+  const round = rounds[idx];
   const animal = ANIMALS.find((a) => a.id === round.animal)!;
   const guessAnimal = ANIMALS.find((a) => a.id === round.robotGuess)!;
   const Svg = animal.Svg;
+  const dataCount = training[round.animal] || 0;
 
   const advance = () => { setFeedback(""); setMood("thinking"); setShowConfetti(false); setIdx((i) => i + 1); };
 
@@ -59,6 +70,7 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
       sfxWrong(); setMood("confused");
       setFeedback("❌ Robi was wrong! " + round.reason);
       speak("i_was_wrong.mp3").then(advance);
+      setCorrections((c) => c + 1);
     }
   };
 
@@ -67,10 +79,14 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
       <Confetti active={showConfetti} />
       <h2 className="text-3xl font-bold">🤖 Phase 2: Robi Guesses!</h2>
       <RobotBuddy mood={mood} size={80} />
-      <div className="text-sm opacity-70">{idx + 1} / {GUESS_ROUNDS.length}</div>
+      <div className="text-sm opacity-70">{idx + 1} / {rounds.length}</div>
 
       <div className="my-2 p-4 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `3px solid ${animal.color}` }}>
         <Svg size={120} />
+      </div>
+
+      <div className="text-sm opacity-50">
+        Robi trained on {dataCount} {animal.label.toLowerCase()}{dataCount !== 1 ? "s" : ""}
       </div>
 
       <div className="text-xl text-center">
