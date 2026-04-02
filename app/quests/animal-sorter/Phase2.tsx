@@ -29,26 +29,27 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
 
   useEffect(() => { speak("I think this is a " + guessAnimal.label + "!"); }, [idx]);
 
+  const advance = () => { setFeedback(""); setMood("thinking"); setIdx((i) => i + 1); };
+
   const respond = (correct: boolean) => {
     if (round.correct && correct) {
       sfxCorrect(); setMood("happy");
       setFeedback("✅ Yep! Robi got it right!");
-      speak("Yay! I got it right!");
+      speak("Yay! I got it right!").then(advance);
     } else if (round.correct && !correct) {
       sfxThink(); setMood("confused");
       setFeedback("🤔 Actually, Robi WAS right! It's a " + animal.label + "!");
-      speak("Actually, I was right! It's a " + animal.label);
+      speak("Actually, I was right! It's a " + animal.label).then(advance);
     } else if (!round.correct && !correct) {
       sfxCorrect(); setMood("happy");
       setFeedback("👏 Good catch! It's a " + animal.label + ", not a " + guessAnimal.label + "! " + round.reason);
-      speak("Good catch! It's a " + animal.label + ". " + round.reason);
+      speak("Good catch! It's a " + animal.label + ". " + round.reason).then(advance);
       setCorrections((c) => c + 1);
     } else {
       sfxWrong(); setMood("confused");
       setFeedback("❌ Hmm, Robi was wrong! It's a " + animal.label + ". " + round.reason);
-      speak("Oops, I was wrong! It's a " + animal.label + ". " + round.reason);
+      speak("Oops, I was wrong! It's a " + animal.label + ". " + round.reason).then(advance);
     }
-    setTimeout(() => { setFeedback(""); setMood("thinking"); setIdx((i) => i + 1); }, 2000);
   };
 
   return (

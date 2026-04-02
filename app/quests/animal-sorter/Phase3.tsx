@@ -33,19 +33,20 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
     );
   }
 
+  const advance = () => { setFeedback(""); setMood("confused"); setIdx((i) => i + 1); };
+
   const pick = (choice: string) => {
     sfxTap();
     if (choice === round.answer) {
       setScore((s) => s + 1);
       sfxCorrect(); setMood("happy");
       setFeedback("✅ " + round.reason);
-      speak(round.reason);
+      speak(round.reason).then(advance);
     } else {
       sfxWrong(); setMood("confused");
       setFeedback("❌ " + round.reason);
-      speak("Not quite! " + round.reason);
+      speak("Not quite! " + round.reason).then(advance);
     }
-    setTimeout(() => { setFeedback(""); setMood("confused"); setIdx((i) => i + 1); }, 2200);
   };
 
   return (

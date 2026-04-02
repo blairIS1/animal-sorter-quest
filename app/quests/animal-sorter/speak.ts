@@ -29,17 +29,20 @@ if (typeof window !== "undefined") {
   speechSynthesis.onvoiceschanged = () => { cachedVoice = null; loadVoices(); };
 }
 
-export function speak(text: string) {
-  if (typeof window === "undefined") return;
-  speechSynthesis.cancel();
-  // Clean up emoji and symbols that TTS mangles
-  const clean = text.replace(/[✅❌👏🤔🎉✨🏷️🤖💥⚠️🦸🔋⚡🛻🐾]/g, "").replace(/\s+/g, " ").trim();
-  if (!clean) return;
-  const u = new SpeechSynthesisUtterance(clean);
-  u.rate = 0.85;
-  u.pitch = 1.15;
-  u.volume = 1;
-  const v = pickVoice();
-  if (v) u.voice = v;
-  speechSynthesis.speak(u);
+export function speak(text: string): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") { resolve(); return; }
+    speechSynthesis.cancel();
+    const clean = text.replace(/[✅❌👏🤔🎉✨🏷️🤖💥⚠️🦸🔋⚡🛻🐾]/g, "").replace(/\s+/g, " ").trim();
+    if (!clean) { resolve(); return; }
+    const u = new SpeechSynthesisUtterance(clean);
+    u.rate = 0.85;
+    u.pitch = 1.15;
+    u.volume = 1;
+    const v = pickVoice();
+    if (v) u.voice = v;
+    u.onend = () => resolve();
+    u.onerror = () => resolve();
+    speechSynthesis.speak(u);
+  });
 }

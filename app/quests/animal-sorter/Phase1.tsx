@@ -30,23 +30,24 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
   useEffect(() => { speak("What animal is this?"); }, [current.id]);
 
   const pick = (cat: string) => {
-    if (cat === current.category) {
+    const correct = cat === current.category;
+    if (correct) {
       sfxCorrect();
       setMood("happy");
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
-      speak("Correct! I learned a new " + current.label + "!");
-      setSorted((s) => s + 1);
+      speak("Correct! I learned a new " + current.label + "!").then(() => {
+        setFeedback(""); setMood("idle");
+        setQueue((q) => q.slice(1));
+        setSorted((s) => s + 1);
+      });
     } else {
       sfxWrong();
       setMood("confused");
       setFeedback("❌ That's a " + current.label + ", not a " + cat + "!");
-      speak("Oops! That's a " + current.label + ", not a " + cat + "!");
+      speak("Oops! That's a " + current.label + ", not a " + cat + "!").then(() => {
+        setFeedback(""); setMood("idle");
+      });
     }
-    setTimeout(() => {
-      setFeedback("");
-      setMood("idle");
-      if (cat === current.category) setQueue((q) => q.slice(1));
-    }, 1200);
   };
 
   return (
