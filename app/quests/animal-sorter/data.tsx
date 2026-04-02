@@ -11,6 +11,9 @@ export const ANIMALS = [
 
 export const CATEGORIES = ["cat", "dog", "bird", "fish", "rabbit"] as const;
 
+export const EVA_ANIMALS = ANIMALS.filter((a) => ["cat", "dog", "fish"].includes(a.id));
+export const EVA_CATEGORIES = ["cat", "dog", "fish"] as const;
+
 export const GUESS_ROUNDS = [
   { animal: "cat", robotGuess: "cat", correct: true },
   { animal: "dog", robotGuess: "dog", correct: true },

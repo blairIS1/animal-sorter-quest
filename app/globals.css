@@ -96,3 +96,12 @@ body {
   from { transform: scale(1); box-shadow: 0 0 10px rgba(239,68,68,0.4); }
   to { transform: scale(1.08); box-shadow: 0 0 25px rgba(239,68,68,0.7); }
 }
+
+/* Eva mode — bigger tap targets for toddlers */
+.eva-btn {
+  min-width: 100px;
+  min-height: 70px;
+  padding: 18px 36px;
+  border-radius: 20px;
+  font-size: 1.4rem;
+}
