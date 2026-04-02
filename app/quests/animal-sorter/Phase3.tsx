@@ -33,7 +33,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
         <h2 className="text-3xl font-bold text-center">Quest Complete!</h2>
         <p className="text-xl">Robi&apos;s brain is <b>{pct}%</b> accurate!</p>
         <p className="text-lg opacity-80 text-center max-w-md">
-          Even tricky animals are hard for AI! Real Google AI learns from millions of photos — just like you taught Robi today!
+          Even tricky animals are hard for AI! Real AI learns from millions of photos — just like you taught Robi today!
         </p>
         <div className="progress-track w-64">
           <div className="progress-fill" style={{ width: `${pct}%` }} />

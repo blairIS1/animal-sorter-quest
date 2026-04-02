@@ -17,12 +17,12 @@ import { TrainingData } from "./data";
 type Phase = "train" | "animate" | "summary" | "catch1" | "test" | "catch2" | "tricky" | "draw";
 
 export default function AnimalSorter({ onComplete, mode }: { onComplete: () => void; mode: Mode }) {
-  const [phase, setPhase] = useState<Phase | number>(mode === "eva" ? 1 : "train");
+  const [phase, setPhase] = useState<Phase | number>(mode === "toddler" ? 1 : "train");
   const [training, setTraining] = useState<TrainingData>({});
 
   return (
     <ModeContext.Provider value={mode}>
-      {mode === "eva" ? (
+      {mode === "toddler" ? (
         <>
           {phase === 1 && <Phase1Eva onComplete={() => setPhase(2)} />}
           {phase === 2 && <Phase2Eva onComplete={() => setPhase(3)} />}

@@ -10,7 +10,7 @@ import { Mode } from "./quests/animal-sorter/ModeContext";
 export default function Home() {
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
-  const [mode, setMode] = useState<Mode>("baker");
+  const [mode, setMode] = useState<Mode>("kid");
 
   if (done) {
     return (
@@ -19,7 +19,7 @@ export default function Home() {
         <RobotBuddy mood="celebrate" size={140} />
         <h1 className="text-4xl font-bold text-center">You did it!</h1>
         <p className="text-lg opacity-80 text-center max-w-md">
-          You taught Robi to recognize animals — just like real AI engineers at Google!
+          You taught Robi to recognize animals — just like real AI engineers!
         </p>
         <button className="btn btn-primary mt-4" onClick={() => { sfxTap(); setStarted(false); setDone(false); }}>
           Play Again 🔄
@@ -41,21 +41,19 @@ export default function Home() {
         <div className="flex gap-3">
           <button
             className="btn flex flex-col items-center gap-1 px-6 py-3"
-            style={{ background: mode === "baker" ? "var(--accent)" : "var(--card)", color: mode === "baker" ? "#0f172a" : "white" }}
-            onClick={() => { sfxTap(); setMode("baker"); }}
+            style={{ background: mode === "kid" ? "var(--accent)" : "var(--card)", color: mode === "kid" ? "#0f172a" : "white" }}
+            onClick={() => { sfxTap(); setMode("kid"); }}
           >
             <span className="text-2xl">🧒</span>
-            <span className="text-sm font-bold">Baker Mode</span>
-            <span className="text-xs opacity-70">Age 7+</span>
+            <span className="text-sm font-bold">Age 7+</span>
           </button>
           <button
             className="btn flex flex-col items-center gap-1 px-6 py-3"
-            style={{ background: mode === "eva" ? "var(--accent)" : "var(--card)", color: mode === "eva" ? "#0f172a" : "white" }}
-            onClick={() => { sfxTap(); setMode("eva"); }}
+            style={{ background: mode === "toddler" ? "var(--accent)" : "var(--card)", color: mode === "toddler" ? "#0f172a" : "white" }}
+            onClick={() => { sfxTap(); setMode("toddler"); }}
           >
             <span className="text-2xl">👶</span>
-            <span className="text-sm font-bold">Eva Mode</span>
-            <span className="text-xs opacity-70">Age 3+</span>
+            <span className="text-sm font-bold">Age 3+</span>
           </button>
         </div>
 
