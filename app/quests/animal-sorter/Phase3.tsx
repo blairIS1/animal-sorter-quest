@@ -4,6 +4,7 @@ import { TRICKY_ROUNDS, ANIMALS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxCelebrate } from "./sfx";
 import { speak } from "./speak";
+import Confetti from "./Confetti";
 
 export default function Phase3({ onComplete }: { onComplete: (score: number) => void }) {
   const [idx, setIdx] = useState(0);
@@ -12,6 +13,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
   const [mood, setMood] = useState<"confused" | "happy" | "celebrate">("confused");
   const spokenRef = useRef(-1);
   const done = idx >= TRICKY_ROUNDS.length;
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
@@ -39,13 +41,13 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
   }
 
   const round = TRICKY_ROUNDS[idx];
-  const advance = () => { setFeedback(""); setMood("confused"); setIdx((i) => i + 1); };
+  const advance = () => { setFeedback(""); setMood("confused"); setShowConfetti(false); setIdx((i) => i + 1); };
 
   const pick = (choice: string) => {
     sfxTap();
     if (choice === round.answer) {
       setScore((s) => s + 1);
-      sfxCorrect(); setMood("happy");
+      sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setFeedback("✅ " + round.reason);
       speak(round.reason).then(advance);
     } else {
@@ -57,6 +59,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
+      <Confetti active={showConfetti} />
       <h2 className="text-3xl font-bold">🤔 Phase 3: Tricky Animals!</h2>
       <RobotBuddy mood={mood} size={80} />
       <div className="text-sm opacity-70">{idx + 1} / {TRICKY_ROUNDS.length}</div>

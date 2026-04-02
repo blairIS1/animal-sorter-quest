@@ -4,14 +4,18 @@ import { ANIMALS, CATEGORIES } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak } from "./speak";
+import Confetti, { Sparkle } from "./Confetti";
+import { useMode } from "./ModeContext";
 
-const makeQueue = () => [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 8);
+const makeQueue = () => [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5);
 
 export default function Phase1({ onComplete }: { onComplete: () => void }) {
-  const [queue] = useState(makeQueue);
+  const mode = useMode();
+  const [queue] = useState(() => makeQueue().slice(0, mode === "eva" ? 4 : 8));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"idle" | "happy" | "confused" | "celebrate">("idle");
+  const [showConfetti, setShowConfetti] = useState(false);
   const done = idx >= queue.length;
   const current = queue[idx];
   const spokenRef = useRef(-1);
@@ -40,9 +44,10 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
     if (cat === current.category) {
       sfxCorrect();
       setMood("happy");
+      setShowConfetti(true);
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
       speak("Correct! I learned a new " + current.label + "!").then(() => {
-        setFeedback(""); setMood("idle");
+        setFeedback(""); setMood("idle"); setShowConfetti(false);
         setIdx((i) => i + 1);
       });
     } else {
@@ -57,6 +62,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
+      <Confetti active={showConfetti} />
       <h2 className="text-3xl font-bold">🏷️ Phase 1: Teach Robi!</h2>
       <RobotBuddy mood={mood} size={80} />
       <div className="text-sm opacity-70">{idx} / {queue.length} taught</div>

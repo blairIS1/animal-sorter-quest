@@ -4,6 +4,7 @@ import { ANIMALS, GUESS_ROUNDS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxThink } from "./sfx";
 import { speak } from "./speak";
+import Confetti from "./Confetti";
 
 export default function Phase2({ onComplete }: { onComplete: (score: number) => void }) {
   const [idx, setIdx] = useState(0);
@@ -12,6 +13,7 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
   const [mood, setMood] = useState<"thinking" | "happy" | "confused">("thinking");
   const spokenRef = useRef(-1);
   const done = idx >= GUESS_ROUNDS.length;
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
@@ -37,11 +39,11 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
   const guessAnimal = ANIMALS.find((a) => a.id === round.robotGuess)!;
   const Svg = animal.Svg;
 
-  const advance = () => { setFeedback(""); setMood("thinking"); setIdx((i) => i + 1); };
+  const advance = () => { setFeedback(""); setMood("thinking"); setShowConfetti(false); setIdx((i) => i + 1); };
 
   const respond = (correct: boolean) => {
     if (round.correct && correct) {
-      sfxCorrect(); setMood("happy");
+      sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setFeedback("✅ Yep! Robi got it right!");
       speak("Yay! I got it right!").then(advance);
     } else if (round.correct && !correct) {
@@ -49,7 +51,7 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
       setFeedback("🤔 Actually, Robi WAS right! It's a " + animal.label + "!");
       speak("Actually, I was right! It's a " + animal.label).then(advance);
     } else if (!round.correct && !correct) {
-      sfxCorrect(); setMood("happy");
+      sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setFeedback("👏 Good catch! " + round.reason);
       speak("Good catch! " + round.reason).then(advance);
       setCorrections((c) => c + 1);
@@ -62,6 +64,7 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
+      <Confetti active={showConfetti} />
       <h2 className="text-3xl font-bold">🤖 Phase 2: Robi Guesses!</h2>
       <RobotBuddy mood={mood} size={80} />
       <div className="text-sm opacity-70">{idx + 1} / {GUESS_ROUNDS.length}</div>
