@@ -13,6 +13,7 @@ body {
   background: var(--bg);
   color: white;
   font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 18px;
   margin: 0;
 }
 

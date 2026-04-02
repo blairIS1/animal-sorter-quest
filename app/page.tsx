@@ -8,6 +8,7 @@ import Confetti from "./quests/animal-sorter/Confetti";
 import { Mode } from "./quests/animal-sorter/ModeContext";
 import { recordCompletion, getCompletions } from "./quests/animal-sorter/mastery";
 import ProgressDashboard from "./quests/animal-sorter/ProgressDashboard";
+import EyeBreak from "./quests/animal-sorter/EyeBreak";
 import { startMusic, stopMusic } from "./quests/animal-sorter/music";
 
 export default function Home() {
@@ -75,6 +76,9 @@ export default function Home() {
           <span>🤔 Phase 3: Tricky animals that confuse even AI!</span>
           <span>🎨 Phase 4: Draw your own animal!</span>
         </div>
+        <div className="rounded-xl p-3 max-w-sm text-center" style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.3)" }}>
+          <span className="text-sm">📏 Hold your tablet at arm&apos;s length — not too close!</span>
+        </div>
         <button className="btn btn-primary text-xl mt-2" onClick={() => {
           sfxTap();
           speak("intro.mp3").then(() => {
@@ -88,5 +92,5 @@ export default function Home() {
     );
   }
 
-  return <AnimalSorter onComplete={() => { sfxCelebrate(); stopMusic(); setCompletions(recordCompletion(mode)); setDone(true); }} mode={mode} />;
+  return <EyeBreak><AnimalSorter onComplete={() => { sfxCelebrate(); stopMusic(); setCompletions(recordCompletion(mode)); setDone(true); }} mode={mode} /></EyeBreak>;
 }
