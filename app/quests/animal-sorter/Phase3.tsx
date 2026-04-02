@@ -47,7 +47,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
     );
   }
 
-  const round = TRICKY_ROUNDS[idx];
+  const round = rounds[idx];
   const advance = () => { setFeedback(""); setMood("confused"); setShowConfetti(false); setIdx((i) => i + 1); };
 
   const pick = (choice: string) => {
