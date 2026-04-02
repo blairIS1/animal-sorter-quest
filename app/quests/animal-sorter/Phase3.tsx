@@ -15,10 +15,13 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
   const done = idx >= TRICKY_ROUNDS.length;
   const [showConfetti, setShowConfetti] = useState(false);
 
+  const TRICKY_AUDIO: Record<string, string> = { Fox: "not_sure_fox.mp3", Penguin: "not_sure_penguin.mp3", Bat: "not_sure_bat.mp3", Turtle: "not_sure_turtle.mp3", Seal: "not_sure_seal.mp3" };
+  const REASON_AUDIO: Record<string, string> = { "Foxes are in the dog family!": "foxes_dog.mp3", "Penguins are birds that swim!": "penguins_bird.mp3", "Bats are mammals, not birds!": "bats_mammal.mp3", "Turtles live on land too — not a fish!": "turtles_land.mp3", "Seals are closer to dogs than fish!": "seals_dog.mp3" };
+
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
       spokenRef.current = idx;
-      speak("Hmm, I'm not sure about this " + TRICKY_ROUNDS[idx].label);
+      speak(TRICKY_AUDIO[TRICKY_ROUNDS[idx].label] || "not_sure_fox.mp3");
     }
   }, [idx, done]);
 
@@ -35,7 +38,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
         <div className="progress-track w-64">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
         </div>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Thank you for teaching me!").then(() => onComplete(score)); }}>🏠 Back to Menu</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("thank_you.mp3").then(() => onComplete(score)); }}>🏠 Back to Menu</button>
       </div>
     );
   }
@@ -49,11 +52,11 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
       setScore((s) => s + 1);
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setFeedback("✅ " + round.reason);
-      speak(round.reason).then(advance);
+      speak(REASON_AUDIO[round.reason] || "foxes_dog.mp3").then(advance);
     } else {
       sfxWrong(); setMood("confused");
       setFeedback("❌ " + round.reason);
-      speak("Not quite! " + round.reason).then(advance);
+      speak("not_quite.mp3").then(() => speak(REASON_AUDIO[round.reason] || "foxes_dog.mp3")).then(advance);
     }
   };
 

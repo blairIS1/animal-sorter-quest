@@ -23,7 +23,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
       spokenRef.current = idx;
-      speak("What animal is this?");
+      speak("what_animal.mp3");
     }
   }, [idx, done]);
 
@@ -33,7 +33,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
         <RobotBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">Robi is learning!</h2>
         <p className="text-lg opacity-80">You taught Robi {queue.length} animals. Let&apos;s see if Robi can guess!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Let's see if I can guess now!").then(onComplete); }}>Next →</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("lets_guess.mp3").then(onComplete); }}>Next →</button>
       </div>
     );
   }
@@ -46,7 +46,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
       setMood("happy");
       setShowConfetti(true);
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
-      speak("Correct! I learned a new " + current.label + "!").then(() => {
+      speak("correct_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle"); setShowConfetti(false);
         setIdx((i) => i + 1);
       });
@@ -54,7 +54,7 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
       sfxWrong();
       setMood("confused");
       setFeedback("❌ That's a " + current.label + ", not a " + cat + "!");
-      speak("Oops! That's a " + current.label + ", not a " + cat + "!").then(() => {
+      speak("oops_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle");
       });
     }

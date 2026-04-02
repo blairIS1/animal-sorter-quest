@@ -19,7 +19,7 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
     if (!done && spokenRef.current !== idx) {
       spokenRef.current = idx;
       const g = ANIMALS.find((a) => a.id === GUESS_ROUNDS[idx].robotGuess)!;
-      speak("I think this is a " + g.label + "!");
+      speak("think_" + g.category + ".mp3");
     }
   }, [idx, done]);
 
@@ -29,7 +29,7 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
         <RobotBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">Robi is getting smarter!</h2>
         <p className="text-lg opacity-80">You corrected {corrections} mistakes. Robi learned from each one!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Time for the tricky round!").then(() => onComplete(corrections)); }}>Next → Tricky Round!</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("tricky_round.mp3").then(() => onComplete(corrections)); }}>Next → Tricky Round!</button>
       </div>
     );
   }
@@ -45,20 +45,20 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
     if (round.correct && correct) {
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setFeedback("✅ Yep! Robi got it right!");
-      speak("Yay! I got it right!").then(advance);
+      speak("got_it_right.mp3").then(advance);
     } else if (round.correct && !correct) {
       sfxThink(); setMood("confused");
       setFeedback("🤔 Actually, Robi WAS right! It's a " + animal.label + "!");
-      speak("Actually, I was right! It's a " + animal.label).then(advance);
+      speak("was_right.mp3").then(advance);
     } else if (!round.correct && !correct) {
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setFeedback("👏 Good catch! " + round.reason);
-      speak("Good catch! " + round.reason).then(advance);
+      speak("good_catch.mp3").then(advance);
       setCorrections((c) => c + 1);
     } else {
       sfxWrong(); setMood("confused");
       setFeedback("❌ Robi was wrong! " + round.reason);
-      speak("Oops, I was wrong! " + round.reason).then(advance);
+      speak("i_was_wrong.mp3").then(advance);
     }
   };
 

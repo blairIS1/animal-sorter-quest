@@ -53,7 +53,7 @@ export default function Phase4({ onComplete }: { onComplete: () => void }) {
     const guess = guesses[Math.floor(Math.random() * guesses.length)];
     setRobiGuess(guess);
     setSubmitted(true);
-    speak("Hmm, is that " + guess + "? No wait, you said it's a " + name + "! I'll remember that! " + name + " is now in my brain!").then(() => {
+    speak("not_sure_fox.mp3").then(() => {
       sfxCelebrate();
     });
   };
@@ -68,7 +68,7 @@ export default function Phase4({ onComplete }: { onComplete: () => void }) {
           Robi thought it was {robiGuess}... but now Robi knows it&apos;s a <b>{name}</b>! You just taught AI something brand new!
         </p>
         <canvas ref={canvasRef} width={250} height={250} style={{ borderRadius: 16, background: "#1e293b", border: "3px solid var(--accent)" }} />
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Thank you for everything! You're an amazing teacher!").then(onComplete); }}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("thank_you.mp3").then(onComplete); }}>
           Finish Quest! 🎉
         </button>
       </div>

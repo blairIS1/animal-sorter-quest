@@ -67,7 +67,7 @@ export default function Home() {
         </div>
         <button className="btn btn-primary text-xl mt-2" onClick={() => {
           sfxTap();
-          speak("Hi! I'm Robi! I just woke up and I don't know any animals. Can you teach me?").then(() => {
+          speak("intro.mp3").then(() => {
             setStarted(true);
           });
         }}>
