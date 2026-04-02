@@ -6,6 +6,7 @@ import Phase3 from "./Phase3";
 import Phase4 from "./Phase4";
 import TrainingAnimation from "./TrainingAnimation";
 import TrainingSummary from "./TrainingSummary";
+import CatchGame from "./CatchGame";
 import Phase1Eva from "./Phase1Eva";
 import Phase2Eva from "./Phase2Eva";
 import Phase3Eva from "./Phase3Eva";
@@ -13,7 +14,7 @@ import Phase4Eva from "./Phase4Eva";
 import { ModeContext, Mode } from "./ModeContext";
 import { TrainingData } from "./data";
 
-type Phase = "train" | "animate" | "summary" | "test" | "tricky" | "draw";
+type Phase = "train" | "animate" | "summary" | "catch1" | "test" | "catch2" | "tricky" | "draw";
 
 export default function AnimalSorter({ onComplete, mode }: { onComplete: () => void; mode: Mode }) {
   const [phase, setPhase] = useState<Phase | number>(mode === "eva" ? 1 : "train");
@@ -32,7 +33,6 @@ export default function AnimalSorter({ onComplete, mode }: { onComplete: () => v
         <>
           {phase === "train" && (
             <Phase1 onComplete={(data) => {
-              // Merge with existing training data for retrain loop
               setTraining((prev) => {
                 const merged = { ...prev };
                 for (const [k, v] of Object.entries(data)) merged[k] = (merged[k] || 0) + v;
@@ -42,16 +42,18 @@ export default function AnimalSorter({ onComplete, mode }: { onComplete: () => v
             }} />
           )}
           {phase === "animate" && <TrainingAnimation training={training} onComplete={() => setPhase("summary")} />}
-          {phase === "summary" && <TrainingSummary training={training} onComplete={() => setPhase("test")} />}
+          {phase === "summary" && <TrainingSummary training={training} onComplete={() => setPhase("catch1")} />}
+          {phase === "catch1" && <CatchGame onComplete={() => setPhase("test")} />}
           {phase === "test" && (
             <Phase2 training={training} onComplete={(needsRetrain) => {
               if (needsRetrain) {
-                setPhase("train"); // #3 — retrain loop, keeps existing training data
+                setPhase("train");
               } else {
-                setPhase("tricky");
+                setPhase("catch2");
               }
             }} />
           )}
+          {phase === "catch2" && <CatchGame onComplete={() => setPhase("tricky")} />}
           {phase === "tricky" && <Phase3 onComplete={() => setPhase("draw")} />}
           {phase === "draw" && <Phase4 onComplete={onComplete} />}
         </>

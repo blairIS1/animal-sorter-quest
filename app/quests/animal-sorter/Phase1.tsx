@@ -15,9 +15,25 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
   const [mood, setMood] = useState<"idle" | "happy" | "confused" | "celebrate">("idle");
   const [showConfetti, setShowConfetti] = useState(false);
   const [training, setTraining] = useState<TrainingData>({});
+  const [shrinkScale, setShrinkScale] = useState(1);
+  const shrinkRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const spokenRef = useRef(-1);
   const done = idx >= queue.length;
   const current = queue[idx];
+
+  // #1 — Shrinking animal: starts at scale 1 (160px) → shrinks to ~0.56 (90px) over 3s
+  useEffect(() => {
+    if (done || feedback) return;
+    setShrinkScale(1);
+    const start = Date.now();
+    const duration = 3000;
+    shrinkRef.current = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const t = Math.min(elapsed / duration, 1);
+      setShrinkScale(1 - t * 0.44); // 1.0 → 0.56
+    }, 50);
+    return () => clearInterval(shrinkRef.current);
+  }, [idx, done, feedback]);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
@@ -38,8 +54,10 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
   }
 
   const Svg = current.Svg;
+  const svgSize = Math.round(160 * shrinkScale);
 
   const pick = (cat: string) => {
+    clearInterval(shrinkRef.current);
     if (cat === current.category) {
       sfxCorrect();
       setMood("happy");
@@ -70,8 +88,14 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
         <div className="progress-fill" style={{ width: `${(idx / queue.length) * 100}%` }} />
       </div>
 
-      <div className="my-2 p-4 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `3px solid ${current.color}` }}>
-        <Svg size={120} />
+      <div className="my-2 p-4 rounded-2xl flex items-center justify-center" style={{
+        background: "rgba(255,255,255,0.05)",
+        border: `3px solid ${current.color}`,
+        width: 180, height: 180,
+      }}>
+        <div style={{ transition: "transform 0.05s linear", transform: `scale(${shrinkScale})` }}>
+          <Svg size={160} />
+        </div>
       </div>
       <div className="text-xl font-semibold">What animal is this?</div>
       <div className="text-lg min-h-[2em] font-semibold">{feedback}</div>
