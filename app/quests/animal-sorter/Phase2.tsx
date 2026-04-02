@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ANIMALS, GUESS_ROUNDS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxThink } from "./sfx";
+import { speak } from "./speak";
 
 export default function Phase2({ onComplete }: { onComplete: (score: number) => void }) {
   const [idx, setIdx] = useState(0);
@@ -26,20 +27,26 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
   const guessAnimal = ANIMALS.find((a) => a.id === round.robotGuess)!;
   const Svg = animal.Svg;
 
+  useEffect(() => { speak("I think this is a " + guessAnimal.label + "!"); }, [idx]);
+
   const respond = (correct: boolean) => {
     if (round.correct && correct) {
       sfxCorrect(); setMood("happy");
       setFeedback("✅ Yep! Robi got it right!");
+      speak("Yay! I got it right!");
     } else if (round.correct && !correct) {
       sfxThink(); setMood("confused");
       setFeedback("🤔 Actually, Robi WAS right! It's a " + animal.label + "!");
+      speak("Actually, I was right! It's a " + animal.label);
     } else if (!round.correct && !correct) {
       sfxCorrect(); setMood("happy");
       setFeedback("👏 Good catch! It's a " + animal.label + ", not a " + guessAnimal.label + "! " + round.reason);
+      speak("Good catch! It's a " + animal.label + ". " + round.reason);
       setCorrections((c) => c + 1);
     } else {
       sfxWrong(); setMood("confused");
       setFeedback("❌ Hmm, Robi was wrong! It's a " + animal.label + ". " + round.reason);
+      speak("Oops, I was wrong! It's a " + animal.label + ". " + round.reason);
     }
     setTimeout(() => { setFeedback(""); setMood("thinking"); setIdx((i) => i + 1); }, 2000);
   };

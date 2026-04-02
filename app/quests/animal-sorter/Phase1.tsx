@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ANIMALS, CATEGORIES } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxCelebrate } from "./sfx";
+import { speak } from "./speak";
 
 const shuffled = [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 8);
 
@@ -19,23 +20,27 @@ export default function Phase1({ onComplete }: { onComplete: () => void }) {
         <RobotBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">Robi is learning!</h2>
         <p className="text-lg opacity-80">You taught Robi {sorted} animals. Let&apos;s see if Robi can guess!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(); }}>Next →</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Let's see if I can guess now!"); onComplete(); }}>Next →</button>
       </div>
     );
   }
 
   const Svg = current.Svg;
 
+  useEffect(() => { speak("What animal is this?"); }, [current.id]);
+
   const pick = (cat: string) => {
     if (cat === current.category) {
       sfxCorrect();
       setMood("happy");
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
+      speak("Correct! I learned a new " + current.label + "!");
       setSorted((s) => s + 1);
     } else {
       sfxWrong();
       setMood("confused");
       setFeedback("❌ That's a " + current.label + ", not a " + cat + "!");
+      speak("Oops! That's a " + current.label + ", not a " + cat + "!");
     }
     setTimeout(() => {
       setFeedback("");

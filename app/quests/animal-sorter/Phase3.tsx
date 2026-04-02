@@ -1,14 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TRICKY_ROUNDS, ANIMALS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxCelebrate } from "./sfx";
+import { speak } from "./speak";
 
 export default function Phase3({ onComplete }: { onComplete: (score: number) => void }) {
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"confused" | "happy" | "celebrate">("confused");
+
+  useEffect(() => { if (TRICKY_ROUNDS[idx]) speak("Hmm, I'm not sure about this " + TRICKY_ROUNDS[idx].label); }, [idx]);
 
   const round = TRICKY_ROUNDS[idx];
   if (!round) {
@@ -36,9 +39,11 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
       setScore((s) => s + 1);
       sfxCorrect(); setMood("happy");
       setFeedback("✅ " + round.reason);
+      speak(round.reason);
     } else {
       sfxWrong(); setMood("confused");
       setFeedback("❌ " + round.reason);
+      speak("Not quite! " + round.reason);
     }
     setTimeout(() => { setFeedback(""); setMood("confused"); setIdx((i) => i + 1); }, 2200);
   };

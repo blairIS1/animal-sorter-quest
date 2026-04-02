@@ -3,6 +3,7 @@ import { useState } from "react";
 import AnimalSorter from "./quests/animal-sorter";
 import RobotBuddy from "./quests/animal-sorter/RobotBuddy";
 import { sfxTap, sfxCelebrate } from "./quests/animal-sorter/sfx";
+import { speak } from "./quests/animal-sorter/speak";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
@@ -36,7 +37,7 @@ export default function Home() {
           <span>🤖 Phase 2: Check if Robi learned correctly</span>
           <span>🤔 Phase 3: Tricky animals that confuse even AI!</span>
         </div>
-        <button className="btn btn-primary text-xl mt-4" onClick={() => { sfxTap(); setStarted(true); }}>
+        <button className="btn btn-primary text-xl mt-4" onClick={() => { sfxTap(); speak("Let's go! Teach me about animals!"); setStarted(true); }}>
           Start Quest! 🚀
         </button>
       </div>
