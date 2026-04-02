@@ -26,22 +26,26 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
   const [shrinkScale, setShrinkScale] = useState(1);
   const shrinkRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const spokenRef = useRef(-1);
+  const [streak, setStreak] = useState(0); // consecutive correct for adaptive difficulty
   const done = idx >= queue.length;
   const current = queue[idx];
 
-  // #1 — Shrinking animal: starts at scale 1 (160px) → shrinks to ~0.56 (90px) over 3s
+  // Adaptive shrink duration: base 3s, -400ms per streak (min 1.4s)
+  const shrinkDuration = Math.max(1400, 3000 - streak * 400);
+
+  // #1 — Shrinking animal: starts at scale 1 (160px) → shrinks to ~0.56 (90px)
   useEffect(() => {
     if (done || feedback) return;
     setShrinkScale(1);
     const start = Date.now();
-    const duration = 3000;
+    const duration = shrinkDuration;
     shrinkRef.current = setInterval(() => {
       const elapsed = Date.now() - start;
       const t = Math.min(elapsed / duration, 1);
       setShrinkScale(1 - t * 0.44); // 1.0 → 0.56
     }, 50);
     return () => clearInterval(shrinkRef.current);
-  }, [idx, done, feedback]);
+  }, [idx, done, feedback, shrinkDuration]);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
@@ -72,6 +76,7 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
       setShowConfetti(true);
       setTraining((t) => ({ ...t, [cat]: (t[cat] || 0) + 1 }));
       recordResult(cat, true);
+      setStreak((s) => s + 1);
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
       speak("correct_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle"); setShowConfetti(false);
@@ -81,6 +86,7 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
       sfxWrong();
       setMood("confused");
       recordResult(current.category, false);
+      setStreak(0);
       setFeedback("❌ That's a " + current.label + ", not a " + cat + "!");
       // Re-queue this animal 2-3 positions later for retry
       setQueue((q) => {
