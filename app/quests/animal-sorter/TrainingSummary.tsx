@@ -8,6 +8,11 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
   const total = Object.values(training).reduce((a, b) => a + b, 0);
   const missing = CATEGORIES.filter((c) => !training[c]);
 
+  // Bias detection: if one category has >50% of all data
+  const maxCat = CATEGORIES.reduce((a, b) => ((training[a] || 0) > (training[b] || 0) ? a : b));
+  const maxCount = training[maxCat] || 0;
+  const isBiased = total > 0 && maxCount / total > 0.5;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <RobotBuddy mood="thinking" size={100} />
@@ -42,14 +47,28 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
         })}
       </div>
 
-      {missing.length > 0 && (
+      {/* #4 — Bias Warning */}
+      {isBiased && (
+        <div className="rounded-xl p-4 max-w-sm text-center" style={{ background: "rgba(251,191,36,0.15)", border: "2px solid #fbbf24" }}>
+          <p className="text-base font-bold" style={{ color: "#fbbf24" }}>⚠️ Bias Detected!</p>
+          <p className="text-sm opacity-80 mt-1">
+            Most of Robi&apos;s data is about <b className="capitalize">{maxCat}s</b> ({Math.round((maxCount / total) * 100)}%).
+            That&apos;s called <b>bias</b> — Robi might think everything is a {maxCat}!
+          </p>
+          <p className="text-xs opacity-60 mt-1">
+            Real AI has this problem too. If you only show it cats, it thinks the whole world is cats!
+          </p>
+        </div>
+      )}
+
+      {!isBiased && missing.length > 0 && (
         <p className="text-base opacity-70 text-center max-w-sm mt-2">
-          ⚠️ Robi has <b>no data</b> for {missing.map((m) => m).join(", ")}!
+          ⚠️ Robi has <b>no data</b> for {missing.join(", ")}!
           <br />It might get those wrong...
         </p>
       )}
 
-      {missing.length === 0 && (
+      {!isBiased && missing.length === 0 && (
         <p className="text-base opacity-70 text-center max-w-sm mt-2">
           Robi has data for every animal — nice! But more data = smarter AI.
         </p>
