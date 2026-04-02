@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TRICKY_ROUNDS, ANIMALS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxCelebrate } from "./sfx";
@@ -10,13 +10,18 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"confused" | "happy" | "celebrate">("confused");
+  const spokenRef = useRef(-1);
+  const done = idx >= TRICKY_ROUNDS.length;
 
-  useEffect(() => { if (TRICKY_ROUNDS[idx]) speak("Hmm, I'm not sure about this " + TRICKY_ROUNDS[idx].label); }, [idx]);
+  useEffect(() => {
+    if (!done && spokenRef.current !== idx) {
+      spokenRef.current = idx;
+      speak("Hmm, I'm not sure about this " + TRICKY_ROUNDS[idx].label);
+    }
+  }, [idx, done]);
 
-  const round = TRICKY_ROUNDS[idx];
-  if (!round) {
+  if (done) {
     const pct = Math.round((score / TRICKY_ROUNDS.length) * 100);
-    sfxCelebrate();
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={140} />
@@ -28,11 +33,12 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
         <div className="progress-track w-64">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
         </div>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(score); }}>🏠 Back to Menu</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Thank you for teaching me!").then(() => onComplete(score)); }}>🏠 Back to Menu</button>
       </div>
     );
   }
 
+  const round = TRICKY_ROUNDS[idx];
   const advance = () => { setFeedback(""); setMood("confused"); setIdx((i) => i + 1); };
 
   const pick = (choice: string) => {

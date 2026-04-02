@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ANIMALS, GUESS_ROUNDS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxThink } from "./sfx";
@@ -10,24 +10,32 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
   const [feedback, setFeedback] = useState("");
   const [corrections, setCorrections] = useState(0);
   const [mood, setMood] = useState<"thinking" | "happy" | "confused">("thinking");
+  const spokenRef = useRef(-1);
+  const done = idx >= GUESS_ROUNDS.length;
 
-  const round = GUESS_ROUNDS[idx];
-  if (!round) {
+  useEffect(() => {
+    if (!done && spokenRef.current !== idx) {
+      spokenRef.current = idx;
+      const g = ANIMALS.find((a) => a.id === GUESS_ROUNDS[idx].robotGuess)!;
+      speak("I think this is a " + g.label + "!");
+    }
+  }, [idx, done]);
+
+  if (done) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">Robi is getting smarter!</h2>
         <p className="text-lg opacity-80">You corrected {corrections} mistakes. Robi learned from each one!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(corrections); }}>Next → Tricky Round!</button>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("Time for the tricky round!").then(() => onComplete(corrections)); }}>Next → Tricky Round!</button>
       </div>
     );
   }
 
+  const round = GUESS_ROUNDS[idx];
   const animal = ANIMALS.find((a) => a.id === round.animal)!;
   const guessAnimal = ANIMALS.find((a) => a.id === round.robotGuess)!;
   const Svg = animal.Svg;
-
-  useEffect(() => { speak("I think this is a " + guessAnimal.label + "!"); }, [idx]);
 
   const advance = () => { setFeedback(""); setMood("thinking"); setIdx((i) => i + 1); };
 
@@ -42,13 +50,13 @@ export default function Phase2({ onComplete }: { onComplete: (score: number) => 
       speak("Actually, I was right! It's a " + animal.label).then(advance);
     } else if (!round.correct && !correct) {
       sfxCorrect(); setMood("happy");
-      setFeedback("👏 Good catch! It's a " + animal.label + ", not a " + guessAnimal.label + "! " + round.reason);
-      speak("Good catch! It's a " + animal.label + ". " + round.reason).then(advance);
+      setFeedback("👏 Good catch! " + round.reason);
+      speak("Good catch! " + round.reason).then(advance);
       setCorrections((c) => c + 1);
     } else {
       sfxWrong(); setMood("confused");
-      setFeedback("❌ Hmm, Robi was wrong! It's a " + animal.label + ". " + round.reason);
-      speak("Oops, I was wrong! It's a " + animal.label + ". " + round.reason).then(advance);
+      setFeedback("❌ Robi was wrong! " + round.reason);
+      speak("Oops, I was wrong! " + round.reason).then(advance);
     }
   };
 
