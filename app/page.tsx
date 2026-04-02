@@ -8,6 +8,7 @@ import Confetti from "./quests/animal-sorter/Confetti";
 import { Mode } from "./quests/animal-sorter/ModeContext";
 import { recordCompletion, getCompletions } from "./quests/animal-sorter/mastery";
 import ProgressDashboard from "./quests/animal-sorter/ProgressDashboard";
+import { startMusic, stopMusic } from "./quests/animal-sorter/music";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
@@ -77,6 +78,7 @@ export default function Home() {
         <button className="btn btn-primary text-xl mt-2" onClick={() => {
           sfxTap();
           speak("intro.mp3").then(() => {
+            startMusic();
             setStarted(true);
           });
         }}>
@@ -86,5 +88,5 @@ export default function Home() {
     );
   }
 
-  return <AnimalSorter onComplete={() => { sfxCelebrate(); setCompletions(recordCompletion(mode)); setDone(true); }} mode={mode} />;
+  return <AnimalSorter onComplete={() => { sfxCelebrate(); stopMusic(); setCompletions(recordCompletion(mode)); setDone(true); }} mode={mode} />;
 }

@@ -15,14 +15,16 @@ import { ModeContext, Mode } from "./ModeContext";
 import { TrainingData } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxTap } from "./sfx";
+import { stopMusic } from "./music";
 
 const SESSION_LIMIT_MS = 12 * 60 * 1000; // 12 minutes
 
-type Phase = "train" | "animate" | "summary" | "catch1" | "test" | "catch2" | "tricky" | "draw";
+type Phase = "name" | "train" | "animate" | "summary" | "catch1" | "test" | "catch2" | "tricky" | "draw";
 
 export default function AnimalSorter({ onComplete, mode }: { onComplete: () => void; mode: Mode }) {
-  const [phase, setPhase] = useState<Phase | number>(mode === "toddler" ? 1 : "train");
+  const [phase, setPhase] = useState<Phase | number>(mode === "toddler" ? 1 : "name");
   const [training, setTraining] = useState<TrainingData>({});
+  const [robotName, setRobotName] = useState("Robi");
   const [resting, setResting] = useState(false);
   const startTime = useRef(Date.now());
 
@@ -45,7 +47,7 @@ export default function AnimalSorter({ onComplete, mode }: { onComplete: () => v
           <p className="text-lg opacity-80 text-center max-w-md">
             Great job! You&apos;ve been playing for a while. Take a break — run around, get a snack, and come back later!
           </p>
-          <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(); }}>
+          <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopMusic(); onComplete(); }}>
             🏠 Back to Menu
           </button>
         </div>
@@ -64,6 +66,22 @@ export default function AnimalSorter({ onComplete, mode }: { onComplete: () => v
         </>
       ) : (
         <>
+          {phase === "name" && (
+            <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
+              <RobotBuddy mood={robotName.trim() ? "happy" : "idle"} size={120} />
+              <h2 className="text-2xl font-bold">Name your robot!</h2>
+              <p className="text-sm opacity-70">Give your robot buddy a name before the quest begins.</p>
+              <input
+                type="text" placeholder="Robi" value={robotName}
+                onChange={(e) => setRobotName(e.target.value.slice(0, 12))}
+                autoFocus
+                style={{ background: "var(--card)", border: "2px solid var(--accent)", borderRadius: 12, padding: "10px 16px", color: "white", fontSize: "1.2rem", textAlign: "center", width: 200 }}
+              />
+              <button className="btn btn-primary" onClick={() => { sfxTap(); nextPhase("train"); }}>
+                Let&apos;s go, {robotName || "Robi"}! 🚀
+              </button>
+            </div>
+          )}
           {phase === "train" && (
             <Phase1 onComplete={(data) => {
               setTraining((prev) => {
