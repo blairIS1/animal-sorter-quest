@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ANIMALS } from "./data";
 import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxTap } from "./sfx";
+import { speak } from "./speak";
 import Confetti from "./Confetti";
 
 const ROUNDS = 3;
@@ -46,7 +47,7 @@ export default function CatchGame({ onComplete }: { onComplete: () => void }) {
   }, []);
 
   useEffect(() => {
-    startRound();
+    speak("what_animal.mp3").then(startRound);
     return () => clearInterval(animRef.current);
   }, [startRound]);
 

@@ -9,6 +9,7 @@ import Confetti from "./Confetti";
 export default function Phase1Eva({ onComplete }: { onComplete: () => void }) {
   const [queue] = useState(() => [...EVA_ANIMALS].sort(() => Math.random() - 0.5));
   const [idx, setIdx] = useState(0);
+  const [choices, setChoices] = useState<string[]>([]);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"idle" | "happy" | "celebrate">("idle");
   const [showConfetti, setShowConfetti] = useState(false);
@@ -16,12 +17,14 @@ export default function Phase1Eva({ onComplete }: { onComplete: () => void }) {
   const done = idx >= queue.length;
   const current = queue[idx];
 
-  // Pick 2 choices: the correct one + one random wrong one
-  const choices = !done ? (() => {
-    const wrong = EVA_CATEGORIES.filter((c) => c !== current.category);
+  // Stable choices — only recompute when idx changes
+  useEffect(() => {
+    if (done) return;
+    const c = queue[idx];
+    const wrong = EVA_CATEGORIES.filter((cat) => cat !== c.category);
     const pick = wrong[Math.floor(Math.random() * wrong.length)];
-    return [current.category, pick].sort(() => Math.random() - 0.5);
-  })() : [];
+    setChoices([c.category, pick].sort(() => Math.random() - 0.5));
+  }, [idx, done, queue]);
 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {

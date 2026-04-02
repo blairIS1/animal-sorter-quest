@@ -7,12 +7,13 @@ import { speak } from "./speak";
 import Confetti from "./Confetti";
 
 export default function Phase3({ onComplete }: { onComplete: (score: number) => void }) {
+  const [rounds] = useState(() => [...TRICKY_ROUNDS].sort(() => Math.random() - 0.5));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"confused" | "happy" | "celebrate">("confused");
   const spokenRef = useRef(-1);
-  const done = idx >= TRICKY_ROUNDS.length;
+  const done = idx >= rounds.length;
   const [showConfetti, setShowConfetti] = useState(false);
 
   const TRICKY_AUDIO: Record<string, string> = { Fox: "not_sure_fox.mp3", Penguin: "not_sure_penguin.mp3", Bat: "not_sure_bat.mp3", Turtle: "not_sure_turtle.mp3", Seal: "not_sure_seal.mp3" };
@@ -21,12 +22,12 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
   useEffect(() => {
     if (!done && spokenRef.current !== idx) {
       spokenRef.current = idx;
-      speak(TRICKY_AUDIO[TRICKY_ROUNDS[idx].label] || "not_sure_fox.mp3");
+      speak(TRICKY_AUDIO[rounds[idx].label] || "not_sure_fox.mp3");
     }
   }, [idx, done]);
 
   if (done) {
-    const pct = Math.round((score / TRICKY_ROUNDS.length) * 100);
+    const pct = Math.round((score / rounds.length) * 100);
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={140} />
@@ -65,7 +66,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
       <Confetti active={showConfetti} />
       <h2 className="text-3xl font-bold">🤔 Phase 3: Tricky Animals!</h2>
       <RobotBuddy mood={mood} size={80} />
-      <div className="text-sm opacity-70">{idx + 1} / {TRICKY_ROUNDS.length}</div>
+      <div className="text-sm opacity-70">{idx + 1} / {rounds.length}</div>
 
       <div className="text-8xl my-2">{round.emoji}</div>
       <div className="text-2xl font-semibold">{round.label}</div>

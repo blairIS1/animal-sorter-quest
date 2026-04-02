@@ -1,16 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AnimalSorter from "./quests/animal-sorter";
 import RobotBuddy from "./quests/animal-sorter/RobotBuddy";
 import { sfxTap, sfxCelebrate } from "./quests/animal-sorter/sfx";
 import { speak } from "./quests/animal-sorter/speak";
 import Confetti from "./quests/animal-sorter/Confetti";
 import { Mode } from "./quests/animal-sorter/ModeContext";
+import { recordCompletion, getCompletions } from "./quests/animal-sorter/scores";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   const [mode, setMode] = useState<Mode>("kid");
+  const [completions, setCompletions] = useState(0);
+
+  useEffect(() => { setCompletions(getCompletions()); }, []);
 
   if (done) {
     return (
@@ -21,6 +25,7 @@ export default function Home() {
         <p className="text-lg opacity-80 text-center max-w-md">
           You taught Robi to recognize animals — just like real AI engineers!
         </p>
+        <p className="text-base opacity-60">🏆 Quests completed: {completions}</p>
         <button className="btn btn-primary mt-4" onClick={() => { sfxTap(); setStarted(false); setDone(false); }}>
           Play Again 🔄
         </button>
@@ -36,6 +41,7 @@ export default function Home() {
         <p className="text-lg text-center opacity-70 max-w-md">
           Meet Robi! This baby robot just woke up and doesn&apos;t know any animals. Can you teach it?
         </p>
+        {completions > 0 && <p className="text-sm opacity-50">🏆 Quests completed: {completions}</p>}
 
         {/* Mode selector */}
         <div className="flex gap-3">
@@ -75,5 +81,5 @@ export default function Home() {
     );
   }
 
-  return <AnimalSorter onComplete={() => { sfxCelebrate(); setDone(true); }} mode={mode} />;
+  return <AnimalSorter onComplete={() => { sfxCelebrate(); setCompletions(recordCompletion(mode)); setDone(true); }} mode={mode} />;
 }
