@@ -6,8 +6,10 @@ import { sfxCorrect, sfxWrong, sfxTap, sfxCelebrate } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
 import { recordResult } from "./mastery";
+import { useRobotName } from "./ModeContext";
 
 export default function Phase3({ onComplete }: { onComplete: (score: number) => void }) {
+  const rn = useRobotName();
   const [rounds] = useState(() => [...TRICKY_ROUNDS].sort(() => Math.random() - 0.5));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
@@ -33,9 +35,9 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={140} />
         <h2 className="text-3xl font-bold text-center">Quest Complete!</h2>
-        <p className="text-xl">Robi&apos;s brain is <b>{pct}%</b> accurate!</p>
+        <p className="text-xl">{rn}&apos;s brain is <b>{pct}%</b> accurate!</p>
         <p className="text-lg opacity-80 text-center max-w-md">
-          Even tricky animals are hard for AI! Real AI learns from millions of photos — just like you taught Robi today!
+          Even tricky animals are hard for AI! Real AI learns from millions of photos — just like you taught {rn} today!
         </p>
         <div className="progress-track w-64">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
@@ -73,7 +75,7 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
 
       <div className="text-8xl my-2">{round.emoji}</div>
       <div className="text-2xl font-semibold">{round.label}</div>
-      <div className="text-lg opacity-70">Robi: &quot;Hmm... I&apos;m not sure about this one!&quot;</div>
+      <div className="text-lg opacity-70">{rn}: &quot;Hmm... I&apos;m not sure about this one!&quot;</div>
       <div className="text-lg min-h-[2em] font-semibold text-center max-w-md">{feedback}</div>
 
       {!feedback && (

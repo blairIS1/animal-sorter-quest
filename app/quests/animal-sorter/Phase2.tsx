@@ -6,6 +6,7 @@ import { sfxCorrect, sfxWrong, sfxTap, sfxThink } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
 import { recordResult } from "./mastery";
+import { useRobotName } from "./ModeContext";
 
 function ConfidenceMeter({ value }: { value: number }) {
   const color = value >= 70 ? "#4ade80" : value >= 45 ? "#fbbf24" : "#ef4444";
@@ -20,14 +21,14 @@ function ConfidenceMeter({ value }: { value: number }) {
   );
 }
 
-function FeatureList({ round }: { round: GuessRound }) {
+function FeatureList({ round, rn }: { round: GuessRound; rn: string }) {
   const guessFeatures = FEATURES[round.robotGuess];
   const actualFeatures = FEATURES[round.animal];
   if (!guessFeatures) return null;
 
   return (
     <div className="rounded-xl p-3 text-sm max-w-xs" style={{ background: "rgba(255,255,255,0.05)" }}>
-      <div className="text-xs opacity-50 mb-1">Robi sees:</div>
+      <div className="text-xs opacity-50 mb-1">{rn} sees:</div>
       <div className="flex flex-wrap gap-1">
         {round.features.map((f) => {
           const isShared = round.misleading?.includes(f);
@@ -46,6 +47,7 @@ function FeatureList({ round }: { round: GuessRound }) {
 }
 
 export default function Phase2({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
+  const rn = useRobotName();
   const [rounds] = useState(() => generateGuessRounds(training));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -71,11 +73,11 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood={needsRetrain ? "confused" : "celebrate"} size={120} />
-        <h2 className="text-3xl font-bold">Robi scored {pct}%!</h2>
+        <h2 className="text-3xl font-bold">{rn} scored {pct}%!</h2>
         <p className="text-lg opacity-80 text-center max-w-md">
           {corrections === 0
-            ? "Perfect! Robi got every one right — great training data!"
-            : `You corrected ${corrections} mistake${corrections > 1 ? "s" : ""}. ${needsRetrain ? "Robi needs more training data!" : "Robi learned from each correction!"}`}
+            ? `Perfect! ${rn} got every one right — great training data!`
+            : `You corrected ${corrections} mistake${corrections > 1 ? "s" : ""}. ${needsRetrain ? `${rn} needs more training data!` : `${rn} learned from each correction!`}`}
         </p>
         <div className="progress-track w-64">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
@@ -85,7 +87,7 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
         {needsRetrain ? (
           <div className="flex gap-3 mt-4">
             <button className="btn" style={{ background: "var(--accent)", color: "#0f172a" }} onClick={() => { sfxTap(); onComplete(true); }}>
-              🔄 Retrain Robi!
+              🔄 Retrain {rn}!
             </button>
             <button className="btn" style={{ background: "var(--card)" }} onClick={() => { sfxTap(); speak("tricky_round.mp3").then(() => onComplete(false)); }}>
               Continue anyway →
@@ -112,12 +114,12 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
     if (round.correct && userSaysCorrect) {
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
       recordResult(round.animal, true);
-      setFeedback("✅ Yep! Robi got it right!");
+      setFeedback("✅ Yep! " + rn + " got it right!");
       speak("got_it_right.mp3").then(advance);
     } else if (round.correct && !userSaysCorrect) {
       sfxThink(); setMood("confused");
       recordResult(round.animal, true);
-      setFeedback("🤔 Actually, Robi WAS right! It's a " + animal.label + "!");
+      setFeedback("🤔 Actually, " + rn + " WAS right! It's a " + animal.label + "!");
       speak("was_right.mp3").then(advance);
     } else if (!round.correct && !userSaysCorrect) {
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
@@ -129,7 +131,7 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
     } else {
       sfxWrong(); setMood("confused");
       recordResult(round.animal, false);
-      setFeedback("❌ Robi was wrong! " + round.reason);
+      setFeedback("❌ " + rn + " was wrong! " + round.reason);
       setCorrectionNote(round.correction || "");
       setCorrections((c) => c + 1);
       speak("i_was_wrong.mp3").then(() => setTimeout(advance, 1500));
@@ -139,7 +141,7 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-3 p-8 fade-in">
       <Confetti active={showConfetti} />
-      <h2 className="text-3xl font-bold">🤖 Phase 2: Robi Guesses!</h2>
+      <h2 className="text-3xl font-bold">🤖 Phase 2: {rn} Guesses!</h2>
       <RobotBuddy mood={mood} size={80} />
       <div className="text-sm opacity-70">{idx + 1} / {rounds.length}</div>
 
@@ -148,17 +150,17 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
       </div>
 
       <div className="text-sm opacity-50">
-        Robi trained on {dataCount} {animal.label.toLowerCase()}{dataCount !== 1 ? "s" : ""}
+        {rn} trained on {dataCount} {animal.label.toLowerCase()}{dataCount !== 1 ? "s" : ""}
       </div>
 
       {/* #5 — Feature checklist */}
-      <FeatureList round={round} />
+      <FeatureList round={round} rn={rn} />
 
       {/* #2 — Confidence meter */}
       <ConfidenceMeter value={round.confidence} />
 
       <div className="text-xl text-center">
-        Robi: &quot;I&apos;m {round.confidence}% sure it&apos;s a... <b style={{ color: guessAnimal.color }}>{guessAnimal.label}!</b>&quot;
+        {rn}: &quot;I&apos;m {round.confidence}% sure it&apos;s a... <b style={{ color: guessAnimal.color }}>{guessAnimal.label}!</b>&quot;
       </div>
       <div className="text-lg min-h-[1.5em] font-semibold text-center max-w-md">{feedback}</div>
       {/* #5 — Show correction note after wrong guess */}

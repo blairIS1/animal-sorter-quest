@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { TrainingData, CATEGORIES, ANIMALS } from "./data";
 import RobotBuddy from "./RobotBuddy";
+import { useRobotName } from "./ModeContext";
 
 export default function TrainingAnimation({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
+  const rn = useRobotName();
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<"loading" | "done">("loading");
   const total = Object.values(training).reduce((a, b) => a + b, 0);
@@ -27,7 +29,7 @@ export default function TrainingAnimation({ training, onComplete }: { training: 
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <RobotBuddy mood="thinking" size={120} />
       <h2 className="text-3xl font-bold">
-        {phase === "loading" ? "⚙️ Robi is training..." : "✅ Training complete!"}
+        {phase === "loading" ? `⚙️ ${rn} is training...` : "✅ Training complete!"}
       </h2>
 
       <div className="flex gap-2 my-2">

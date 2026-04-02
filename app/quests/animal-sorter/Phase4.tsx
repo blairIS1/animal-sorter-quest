@@ -5,6 +5,7 @@ import RobotBuddy from "./RobotBuddy";
 import { sfxTap, sfxCorrect, sfxCelebrate } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
+import { useRobotName } from "./ModeContext";
 
 const COLORS = ["#f87171", "#fbbf24", "#4ade80", "#38bdf8", "#a78bfa", "#fb923c", "#f472b6", "#ffffff"];
 
@@ -37,6 +38,7 @@ function classify(selected: string[]): { guess: string; confidence: number; reas
 }
 
 export default function Phase4({ onComplete }: { onComplete: () => void }) {
+  const rn = useRobotName();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [name, setName] = useState("");
   const [drawing, setDrawing] = useState(false);
@@ -95,28 +97,28 @@ export default function Phase4({ onComplete }: { onComplete: () => void }) {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
         <Confetti active={true} />
         <RobotBuddy mood="celebrate" size={100} />
-        <h2 className="text-2xl font-bold">🚀 Robi&apos;s Deployment Result</h2>
+        <h2 className="text-2xl font-bold">🚀 {rn}&apos;s Deployment Result</h2>
 
         <div className="flex items-center gap-3">
           <GuessIcon size={48} />
-          <span className="text-xl">Robi thinks your <b>{name || "animal"}</b> is a <b style={{ color: guessAnimal.color }}>{guessAnimal.label}</b>!</span>
+          <span className="text-xl">{rn} thinks your <b>{name || "animal"}</b> is a <b style={{ color: guessAnimal.color }}>{guessAnimal.label}</b>!</span>
         </div>
 
         <div className="text-lg">Confidence: <b>{result.confidence}%</b></div>
 
         <div className="rounded-xl p-3 text-sm max-w-sm" style={{ background: "rgba(255,255,255,0.05)" }}>
-          <div className="text-xs opacity-50 mb-2">Robi&apos;s reasoning:</div>
+          <div className="text-xs opacity-50 mb-2">{rn}&apos;s reasoning:</div>
           {result.reasoning.map((r, i) => <div key={i}>{r}</div>)}
         </div>
 
         <p className="text-base opacity-70 text-center max-w-sm">
           {result.confidence >= 70
-            ? "Robi is pretty confident! The features matched well."
-            : "Robi isn't sure — the features didn't match any animal perfectly. Real AI struggles with new things too!"}
+            ? `${rn} is pretty confident! The features matched well.`
+            : `${rn} isn't sure — the features didn't match any animal perfectly. Real AI struggles with new things too!`}
         </p>
 
         <p className="text-sm opacity-50 text-center max-w-sm">
-          Now Robi knows what a <b>{name || "new animal"}</b> looks like. You just deployed AI to the real world! 🌍
+          Now {rn} knows what a <b>{name || "new animal"}</b> looks like. You just deployed AI to the real world! 🌍
         </p>
 
         <button className="btn btn-success mt-2" onClick={() => { sfxTap(); speak("thank_you.mp3").then(onComplete); }}>
@@ -132,7 +134,7 @@ export default function Phase4({ onComplete }: { onComplete: () => void }) {
         <h2 className="text-2xl font-bold">🔍 Describe Your Animal</h2>
         <RobotBuddy mood="thinking" size={80} />
         <p className="text-sm opacity-70 text-center max-w-sm">
-          Pick the features your <b>{name}</b> has. Robi will use these to classify it!
+          Pick the features your <b>{name}</b> has. {rn} will use these to classify it!
         </p>
 
         <div className="flex flex-wrap justify-center gap-2 max-w-sm">
@@ -152,7 +154,7 @@ export default function Phase4({ onComplete }: { onComplete: () => void }) {
           disabled={selectedFeatures.length === 0}
           onClick={submitFeatures}
         >
-          Let Robi Classify! 🤖
+          Let {rn} Classify! 🤖
         </button>
       </div>
     );
@@ -160,10 +162,10 @@ export default function Phase4({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
-      <h2 className="text-2xl font-bold">🚀 Phase 4: Deploy Robi!</h2>
+      <h2 className="text-2xl font-bold">🚀 Phase 4: Deploy {rn}!</h2>
       <RobotBuddy mood="thinking" size={80} />
       <p className="opacity-70 text-center max-w-sm text-sm">
-        A new animal arrived! Draw it, name it, and Robi will try to classify it using what it learned.
+        A new animal arrived! Draw it, name it, and {rn} will try to classify it using what it learned.
       </p>
 
       <canvas

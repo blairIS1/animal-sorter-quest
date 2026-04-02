@@ -25,7 +25,7 @@ export default function Home() {
         <RobotBuddy mood="celebrate" size={140} />
         <h1 className="text-4xl font-bold text-center">You did it!</h1>
         <p className="text-lg opacity-80 text-center max-w-md">
-          You taught Robi to recognize animals — just like real AI engineers!
+          You taught your robot to recognize animals — just like real AI engineers!
         </p>
         <ProgressDashboard />
         <p className="text-base opacity-60">🏆 Quests completed: {completions}</p>

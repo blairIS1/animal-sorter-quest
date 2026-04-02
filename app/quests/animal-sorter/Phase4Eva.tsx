@@ -4,10 +4,12 @@ import RobotBuddy from "./RobotBuddy";
 import { sfxTap, sfxCelebrate } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
+import { useRobotName } from "./ModeContext";
 
 const COLORS = ["#f87171", "#fbbf24", "#4ade80", "#38bdf8"];
 
 export default function Phase4Eva({ onComplete }: { onComplete: () => void }) {
+  const rn = useRobotName();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [color, setColor] = useState("#4ade80");
   const [drawing, setDrawing] = useState(false);
@@ -57,7 +59,7 @@ export default function Phase4Eva({ onComplete }: { onComplete: () => void }) {
         <Confetti active={true} />
         <RobotBuddy mood="celebrate" size={140} />
         <h2 className="text-3xl font-bold">🎨 Wow, beautiful!</h2>
-        <p className="text-xl opacity-80">Robi loves your drawing!</p>
+        <p className="text-xl opacity-80">{rn} loves your drawing!</p>
         <button className="btn btn-success mt-4 eva-btn" onClick={() => { sfxTap(); onComplete(); }}>
           Finish! 🎉
         </button>
@@ -67,7 +69,7 @@ export default function Phase4Eva({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
-      <h2 className="text-2xl font-bold">🎨 Draw for Robi!</h2>
+      <h2 className="text-2xl font-bold">🎨 Draw for {rn}!</h2>
       <RobotBuddy mood="happy" size={80} />
 
       <canvas
@@ -93,7 +95,7 @@ export default function Phase4Eva({ onComplete }: { onComplete: () => void }) {
         disabled={!drawing}
         onClick={submit}
       >
-        Show Robi! 🤖
+        Show {rn}! 🤖
       </button>
     </div>
   );

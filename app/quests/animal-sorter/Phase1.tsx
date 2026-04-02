@@ -6,6 +6,7 @@ import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
 import { recordResult, getWeakest } from "./mastery";
+import { useRobotName } from "./ModeContext";
 
 // Guarantee all 5 animals appear, weight extras toward weakest
 const makeQueue = () => {
@@ -17,6 +18,7 @@ const makeQueue = () => {
 };
 
 export default function Phase1({ onComplete }: { onComplete: (data: TrainingData) => void }) {
+  const rn = useRobotName();
   const [queue, setQueue] = useState(makeQueue);
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -58,8 +60,8 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={120} />
-        <h2 className="text-3xl font-bold">Robi is learning!</h2>
-        <p className="text-lg opacity-80">You taught Robi {queue.length} animals. Let&apos;s see if Robi can guess!</p>
+        <h2 className="text-3xl font-bold">{rn} is learning!</h2>
+        <p className="text-lg opacity-80">You taught {rn} {queue.length} animals. Let&apos;s see if {rn} can guess!</p>
         <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak("lets_guess.mp3").then(() => onComplete(training)); }}>Next →</button>
       </div>
     );
@@ -77,7 +79,7 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
       setTraining((t) => ({ ...t, [cat]: (t[cat] || 0) + 1 }));
       recordResult(cat, true);
       setStreak((s) => s + 1);
-      setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
+      setFeedback("✅ Correct! " + rn + " learned a new " + current.label + "!");
       speak("correct_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle"); setShowConfetti(false);
         setIdx((i) => i + 1);
@@ -104,7 +106,7 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
       <Confetti active={showConfetti} />
-      <h2 className="text-3xl font-bold">🏷️ Phase 1: Teach Robi!</h2>
+      <h2 className="text-3xl font-bold">🏷️ Phase 1: Teach {rn}!</h2>
       <RobotBuddy mood={mood} size={80} />
       <div className="text-sm opacity-70">{idx} / {queue.length} taught</div>
       <div className="progress-track w-64">

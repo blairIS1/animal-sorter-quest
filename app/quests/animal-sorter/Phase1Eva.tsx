@@ -5,8 +5,10 @@ import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxTap } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
+import { useRobotName } from "./ModeContext";
 
 export default function Phase1Eva({ onComplete }: { onComplete: () => void }) {
+  const rn = useRobotName();
   const [queue] = useState(() => [...EVA_ANIMALS].sort(() => Math.random() - 0.5));
   const [idx, setIdx] = useState(0);
   const [choices, setChoices] = useState<string[]>([]);
@@ -38,7 +40,7 @@ export default function Phase1Eva({ onComplete }: { onComplete: () => void }) {
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <RobotBuddy mood="celebrate" size={140} />
         <h2 className="text-3xl font-bold">🎉 Yay!</h2>
-        <p className="text-xl opacity-80">Robi learned {queue.length} animals!</p>
+        <p className="text-xl opacity-80">{rn} learned {queue.length} animals!</p>
         <button className="btn btn-success mt-4 eva-btn" onClick={() => { sfxTap(); speak("lets_guess.mp3").then(onComplete); }}>
           Next →
         </button>
@@ -69,7 +71,7 @@ export default function Phase1Eva({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <Confetti active={showConfetti} />
-      <h2 className="text-2xl font-bold">🏷️ Teach Robi!</h2>
+      <h2 className="text-2xl font-bold">🏷️ Teach {rn}!</h2>
       <RobotBuddy mood={mood} size={100} />
 
       <div className="my-2 p-6 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: `4px solid ${current.color}` }}>

@@ -40,10 +40,10 @@ export default function AnimalSorter({ onComplete, mode }: { onComplete: () => v
   // Rest screen
   if (resting) {
     return (
-      <ModeContext.Provider value={mode}>
+      <ModeContext.Provider value={{ mode, robotName }}>
         <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
           <RobotBuddy mood="idle" size={120} />
-          <h2 className="text-3xl font-bold text-center">Robi needs a rest! 😴</h2>
+          <h2 className="text-3xl font-bold text-center">{robotName} needs a rest! 😴</h2>
           <p className="text-lg opacity-80 text-center max-w-md">
             Great job! You&apos;ve been playing for a while. Take a break — run around, get a snack, and come back later!
           </p>
@@ -56,7 +56,7 @@ export default function AnimalSorter({ onComplete, mode }: { onComplete: () => v
   }
 
   return (
-    <ModeContext.Provider value={mode}>
+    <ModeContext.Provider value={{ mode, robotName }}>
       {mode === "toddler" ? (
         <>
           {phase === 1 && <Phase1Eva onComplete={() => nextPhase(2)} />}

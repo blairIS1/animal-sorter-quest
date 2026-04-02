@@ -3,5 +3,8 @@ import { createContext, useContext } from "react";
 
 export type Mode = "kid" | "toddler";
 
-export const ModeContext = createContext<Mode>("kid");
-export const useMode = () => useContext(ModeContext);
+type GameContext = { mode: Mode; robotName: string };
+
+export const ModeContext = createContext<GameContext>({ mode: "kid", robotName: "Robi" });
+export const useMode = () => useContext(ModeContext).mode;
+export const useRobotName = () => useContext(ModeContext).robotName;
