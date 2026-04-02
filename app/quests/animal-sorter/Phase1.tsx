@@ -6,7 +6,12 @@ import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
 
-const makeQueue = () => [...ANIMALS, ...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 8);
+// Guarantee all 5 animals appear at least once, then fill remaining 3 slots randomly
+const makeQueue = () => {
+  const base = [...ANIMALS];
+  const extras = [...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 3);
+  return [...base, ...extras].sort(() => Math.random() - 0.5);
+};
 
 export default function Phase1({ onComplete }: { onComplete: (data: TrainingData) => void }) {
   const [queue] = useState(makeQueue);
