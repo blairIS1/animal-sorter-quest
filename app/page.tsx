@@ -37,7 +37,12 @@ export default function Home() {
           <span>🤖 Phase 2: Check if Robi learned correctly</span>
           <span>🤔 Phase 3: Tricky animals that confuse even AI!</span>
         </div>
-        <button className="btn btn-primary text-xl mt-4" onClick={() => { sfxTap(); speak("Let's go! Teach me about animals!"); setStarted(true); }}>
+        <button className="btn btn-primary text-xl mt-4" onClick={() => {
+          sfxTap();
+          speak("Hi! I'm Robi! I just woke up and I don't know any animals. Can you teach me?").then(() => {
+            setStarted(true);
+          });
+        }}>
           Start Quest! 🚀
         </button>
       </div>
