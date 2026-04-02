@@ -1,30 +1,45 @@
 "use client";
 
-let voice: SpeechSynthesisVoice | null = null;
+let cachedVoice: SpeechSynthesisVoice | null = null;
+let voicesLoaded = false;
 
-function getVoice() {
-  if (voice) return voice;
+function loadVoices(): SpeechSynthesisVoice[] {
   const voices = speechSynthesis.getVoices();
-  voice = voices.find((v) => v.name.includes("Samantha")) ??
-    voices.find((v) => v.lang.startsWith("en") && v.name.includes("Female")) ??
-    voices.find((v) => v.lang.startsWith("en")) ??
-    voices[0] ?? null;
-  return voice;
+  voicesLoaded = voices.length > 0;
+  return voices;
 }
 
-// preload voices
+function pickVoice(): SpeechSynthesisVoice | null {
+  if (cachedVoice) return cachedVoice;
+  const voices = loadVoices();
+  // Prefer high-quality English voices in this order
+  const prefs = ["Google US English", "Google UK English Female", "Samantha", "Karen", "Moira", "Fiona", "Tessa", "Microsoft Zira", "Microsoft Jenny"];
+  for (const p of prefs) {
+    const v = voices.find((v) => v.name.includes(p));
+    if (v) { cachedVoice = v; return v; }
+  }
+  // Fallback: any English voice that's NOT "compact" or low quality
+  cachedVoice = voices.find((v) => v.lang.startsWith("en") && !v.name.includes("compact")) ??
+    voices.find((v) => v.lang.startsWith("en")) ?? voices[0] ?? null;
+  return cachedVoice;
+}
+
 if (typeof window !== "undefined") {
-  speechSynthesis.getVoices();
-  speechSynthesis.onvoiceschanged = () => { voice = null; getVoice(); };
+  loadVoices();
+  speechSynthesis.onvoiceschanged = () => { cachedVoice = null; loadVoices(); };
 }
 
-export function speak(text: string, rate = 0.9) {
+export function speak(text: string) {
   if (typeof window === "undefined") return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = rate;
-  u.pitch = 1.3;
-  const v = getVoice();
+  // Clean up emoji and symbols that TTS mangles
+  const clean = text.replace(/[✅❌👏🤔🎉✨🏷️🤖💥⚠️🦸🔋⚡🛻🐾]/g, "").replace(/\s+/g, " ").trim();
+  if (!clean) return;
+  const u = new SpeechSynthesisUtterance(clean);
+  u.rate = 0.85;
+  u.pitch = 1.15;
+  u.volume = 1;
+  const v = pickVoice();
   if (v) u.voice = v;
   speechSynthesis.speak(u);
 }
