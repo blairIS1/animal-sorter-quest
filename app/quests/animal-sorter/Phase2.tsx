@@ -5,6 +5,7 @@ import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxThink } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
+import { recordResult } from "./mastery";
 
 function ConfidenceMeter({ value }: { value: number }) {
   const color = value >= 70 ? "#4ade80" : value >= 45 ? "#fbbf24" : "#ef4444";
@@ -110,20 +111,24 @@ export default function Phase2({ training, onComplete }: { training: TrainingDat
   const respond = (userSaysCorrect: boolean) => {
     if (round.correct && userSaysCorrect) {
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
+      recordResult(round.animal, true);
       setFeedback("✅ Yep! Robi got it right!");
       speak("got_it_right.mp3").then(advance);
     } else if (round.correct && !userSaysCorrect) {
       sfxThink(); setMood("confused");
+      recordResult(round.animal, true);
       setFeedback("🤔 Actually, Robi WAS right! It's a " + animal.label + "!");
       speak("was_right.mp3").then(advance);
     } else if (!round.correct && !userSaysCorrect) {
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
+      recordResult(round.animal, true);
       setFeedback("👏 Good catch! " + round.reason);
       setCorrectionNote(round.correction || "");
       setCorrections((c) => c + 1);
       speak("good_catch.mp3").then(() => setTimeout(advance, 1500));
     } else {
       sfxWrong(); setMood("confused");
+      recordResult(round.animal, false);
       setFeedback("❌ Robi was wrong! " + round.reason);
       setCorrectionNote(round.correction || "");
       setCorrections((c) => c + 1);

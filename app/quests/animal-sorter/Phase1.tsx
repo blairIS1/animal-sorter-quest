@@ -5,16 +5,19 @@ import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
+import { recordResult, getWeakest } from "./mastery";
 
-// Guarantee all 5 animals appear at least once, then fill remaining 3 slots randomly
+// Guarantee all 5 animals appear, weight extras toward weakest
 const makeQueue = () => {
+  const weak = getWeakest(CATEGORIES);
   const base = [...ANIMALS];
-  const extras = [...ANIMALS].sort(() => Math.random() - 0.5).slice(0, 3);
+  // 3 extra slots weighted toward weakest animals
+  const extras = weak.slice(0, 3).map((id) => ANIMALS.find((a) => a.id === id)!);
   return [...base, ...extras].sort(() => Math.random() - 0.5);
 };
 
 export default function Phase1({ onComplete }: { onComplete: (data: TrainingData) => void }) {
-  const [queue] = useState(makeQueue);
+  const [queue, setQueue] = useState(makeQueue);
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"idle" | "happy" | "confused" | "celebrate">("idle");
@@ -68,6 +71,7 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
       setMood("happy");
       setShowConfetti(true);
       setTraining((t) => ({ ...t, [cat]: (t[cat] || 0) + 1 }));
+      recordResult(cat, true);
       setFeedback("✅ Correct! Robi learned a new " + current.label + "!");
       speak("correct_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle"); setShowConfetti(false);
@@ -76,7 +80,15 @@ export default function Phase1({ onComplete }: { onComplete: (data: TrainingData
     } else {
       sfxWrong();
       setMood("confused");
+      recordResult(current.category, false);
       setFeedback("❌ That's a " + current.label + ", not a " + cat + "!");
+      // Re-queue this animal 2-3 positions later for retry
+      setQueue((q) => {
+        const copy = [...q];
+        const insertAt = Math.min(idx + 2 + Math.floor(Math.random() * 2), copy.length);
+        copy.splice(insertAt, 0, current);
+        return copy;
+      });
       speak("oops_" + current.category + ".mp3").then(() => {
         setFeedback(""); setMood("idle");
       });

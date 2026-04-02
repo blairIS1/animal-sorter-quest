@@ -5,6 +5,7 @@ import RobotBuddy from "./RobotBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxCelebrate } from "./sfx";
 import { speak } from "./speak";
 import Confetti from "./Confetti";
+import { recordResult } from "./mastery";
 
 export default function Phase3({ onComplete }: { onComplete: (score: number) => void }) {
   const [rounds] = useState(() => [...TRICKY_ROUNDS].sort(() => Math.random() - 0.5));
@@ -52,10 +53,12 @@ export default function Phase3({ onComplete }: { onComplete: (score: number) => 
     if (choice === round.answer) {
       setScore((s) => s + 1);
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
+      recordResult(round.label.toLowerCase(), true);
       setFeedback("✅ " + round.reason);
       speak(REASON_AUDIO[round.reason] || "foxes_dog.mp3").then(advance);
     } else {
       sfxWrong(); setMood("confused");
+      recordResult(round.label.toLowerCase(), false);
       setFeedback("❌ " + round.reason);
       speak("not_quite.mp3").then(() => speak(REASON_AUDIO[round.reason] || "foxes_dog.mp3")).then(advance);
     }

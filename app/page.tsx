@@ -6,7 +6,8 @@ import { sfxTap, sfxCelebrate } from "./quests/animal-sorter/sfx";
 import { speak } from "./quests/animal-sorter/speak";
 import Confetti from "./quests/animal-sorter/Confetti";
 import { Mode } from "./quests/animal-sorter/ModeContext";
-import { recordCompletion, getCompletions } from "./quests/animal-sorter/scores";
+import { recordCompletion, getCompletions } from "./quests/animal-sorter/mastery";
+import ProgressDashboard from "./quests/animal-sorter/ProgressDashboard";
 
 export default function Home() {
   const [started, setStarted] = useState(false);
@@ -25,6 +26,7 @@ export default function Home() {
         <p className="text-lg opacity-80 text-center max-w-md">
           You taught Robi to recognize animals — just like real AI engineers!
         </p>
+        <ProgressDashboard />
         <p className="text-base opacity-60">🏆 Quests completed: {completions}</p>
         <button className="btn btn-primary mt-4" onClick={() => { sfxTap(); setStarted(false); setDone(false); }}>
           Play Again 🔄
@@ -42,6 +44,9 @@ export default function Home() {
           Meet Robi! This baby robot just woke up and doesn&apos;t know any animals. Can you teach it?
         </p>
         {completions > 0 && <p className="text-sm opacity-50">🏆 Quests completed: {completions}</p>}
+
+        {/* Mastery progress */}
+        {completions > 0 && <ProgressDashboard />}
 
         {/* Mode selector */}
         <div className="flex gap-3">
